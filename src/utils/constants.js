@@ -1,0 +1,21 @@
+const W_KEYCODE = 87;
+const A_KEYCODE = 65;
+const S_KEYCODE = 83;
+const D_KEYCODE = 68;
+
+const UP_KEYCODE = 38;
+const DOWN_KEYCODE = 40;
+const LEFT_KEYCODE = 37;
+const RIGHT_KEYCODE = 39;
+
+const KEY_CODES = {
+	W_KEYCODE,
+	A_KEYCODE,
+	S_KEYCODE,
+	D_KEYCODE,
+	UP_KEYCODE,
+	DOWN_KEYCODE,
+	LEFT_KEYCODE,
+	RIGHT_KEYCODE,
+};
+export { KEY_CODES };
