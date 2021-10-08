@@ -8,6 +8,15 @@ const DOWN_KEYCODE = 40;
 const LEFT_KEYCODE = 37;
 const RIGHT_KEYCODE = 39;
 
+const HEIGHT = 0.07;
+const WIDTH = 0.5;
+const LENGTH = 1;
+const WHEELS = 0.1;
+const ROTATION = 0.15;
+const LEFT = 2.35;
+const RIGHT = -0.85;
+const UP = 0.8;
+
 const KEY_CODES = {
 	W_KEYCODE,
 	A_KEYCODE,
@@ -18,4 +27,15 @@ const KEY_CODES = {
 	LEFT_KEYCODE,
 	RIGHT_KEYCODE,
 };
-export { KEY_CODES };
+
+const SKATEBOARD = {
+	HEIGHT,
+	WIDTH,
+	LENGTH,
+	WHEELS,
+	ROTATION,
+	LEFT,
+	RIGHT,
+	UP,
+};
+export { KEY_CODES, SKATEBOARD };

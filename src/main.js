@@ -1,24 +1,18 @@
 import '../style.css';
 
 import Game from './Game';
-import * as THREE from 'three';
+
 // Global vars
-let camera, scene, renderer, skateboard;
-camera = 1;
-scene = 2;
-renderer = 3;
-skateboard = 4;
+let camera, scene, renderer, controls;
 
 let game = new Game();
 
 animate();
 
 function animate() {
-	// console.log('zxcv', game.skateboard.animation);
 	requestAnimationFrame(animate);
-
 	game.skateboard.animation();
-
+	game.controls.update();
 	game.renderer.render(game.scene, game.camera);
 }
 
