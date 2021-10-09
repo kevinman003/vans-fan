@@ -1,5 +1,7 @@
 import * as THREE from 'three';
-import { KEY_CODES, SKATEBOARD } from './utils/constants';
+import { KEY_CODES } from './utils/constants/constants';
+import { SKATEBOARD } from './utils/constants/skateboard';
+import { mod } from './utils/utils';
 
 export default class Skateboard {
 	constructor(scene, camera, keyListener) {
@@ -15,6 +17,9 @@ export default class Skateboard {
 		this.scene.add(this.skateboard);
 		this.x = 0;
 		this.z = 0;
+		this.rotation = 0;
+		this.rotationMult = 1;
+		console.log(SKATEBOARD);
 	}
 
 	createSkateboard() {
@@ -31,50 +36,80 @@ export default class Skateboard {
 
 	animation() {
 		this.geo.center();
-
-		if (this.keyListener.isKeyPressed(KEY_CODES.A_KEYCODE)) {
-			if (this.isFacingLeft()) {
-				this.turn(SKATEBOARD.ROTATION);
-			}
-			this.z -= 0.003;
-			this.skateboard.translateZ(this.z);
-		} else if (this.keyListener.isKeyPressed(KEY_CODES.D_KEYCODE)) {
-			if (this.isFacingRight()) {
-				this.turn(-SKATEBOARD.ROTATION);
-			}
-			this.z -= 0.003;
-			this.skateboard.translateZ(this.z);
-		} else if (this.keyListener.isKeyPressed(KEY_CODES.W_KEYCODE)) {
-			if (
-				this.skateboard.rotation.y < SKATEBOARD.UP ||
-				this.skateboard.rotation.y > SKATEBOARD.UP + SKATEBOARD.ROTATION
-			) {
-				this.skateboard.rotation.y -= SKATEBOARD.ROTATION;
-			}
-		}
-		console.log(this.skateboard.rotation.y);
+		this.move();
 	}
 
-	turn(rotation) {
-		this.skateboard.rotation.y += rotation;
-		// 	Math.round(this.skateboard.rotation.y, 2) + rotation;
-		// console.log('afdsa', this.skateboard.rotation.y);
+	turn(direction, opposite) {
+		let rotationMult = this.isLessClockwise(
+			this.skateboard.rotation.y,
+			direction
+		)
+			? SKATEBOARD.CLOCKWISE
+			: SKATEBOARD.C_CLOCKWISE;
+		console.log('rotation', rotationMult);
+		let rotationAng = this.rotation + SKATEBOARD.ROTATION;
+		// if (rotation)
+		this.rotation += SKATEBOARD.ROTATION * rotationMult;
+		if (this.rotation < -Math.PI) this.rotation += 2 * Math.PI;
+		else if (this.rotation > Math.PI * 2) this.rotation -= 2 * Math.PI;
+		this.skateboard.rotation.y = this.rotation;
 		// this.skateboard.rotation.y = Math.round(this.skateboard.rotation.y, 2);
 	}
 
-	isFacingLeft() {
-		return (
-			this.skateboard.rotation.y < SKATEBOARD.LEFT ||
-			this.skateboard.rotation.y > SKATEBOARD.LEFT + SKATEBOARD.ROTATION
-		);
+	move() {
+		if (this.keyListener.isKeyPressed(KEY_CODES.A)) {
+			if (!this.isFacingDirection(SKATEBOARD.LEFT.AMOUNT)) {
+				this.turn(SKATEBOARD.LEFT.AMOUNT, SKATEBOARD.LEFT.OPPOSITE);
+			}
+			this.moveBoardAndCamera();
+		} else if (this.keyListener.isKeyPressed(KEY_CODES.D)) {
+			if (!this.isFacingDirection(SKATEBOARD.RIGHT.AMOUNT)) {
+				this.turn(SKATEBOARD.RIGHT.AMOUNT, SKATEBOARD.RIGHT.OPPOSITE);
+			}
+			this.moveBoardAndCamera();
+		} else if (this.keyListener.isKeyPressed(KEY_CODES.W)) {
+			if (!this.isFacingDirection(SKATEBOARD.UP.AMOUNT)) {
+				this.turn(SKATEBOARD.UP.AMOUNT, SKATEBOARD.UP.OPPOSITE);
+			}
+			// this.x -= 0.01;
+			this.moveBoardAndCamera();
+		} else if (this.keyListener.isKeyPressed(KEY_CODES.S)) {
+			if (!this.isFacingDirection(SKATEBOARD.DOWN.AMOUNT)) {
+				this.turn(SKATEBOARD.DOWN.AMOUNT, SKATEBOARD.DOWN.OPPOSITE);
+			}
+			this.moveBoardAndCamera();
+		}
+		console.log((this.skateboard.rotation.y / Math.PI) * 4);
 	}
 
-	isFacingRight() {
-		return (
-			this.skateboard.rotation.y < SKATEBOARD.RIGHT ||
-			this.skateboard.rotation.y > SKATEBOARD.RIGHT + SKATEBOARD.ROTATION
-		);
+	moveBoardAndCamera() {
+		this.skateboard.translateZ(-SKATEBOARD.SPEED);
+		// this.camera.position.copy(this.skateboard.position);
+		// this.camera.translateX(this.skateboard.position.x);
+		this.camera.translateY(this.skateboard.position.y);
+		// this.camera.translateZ(this.skateboard.position.z);
+		// this.camera.lookAt(this.skateboard);
 	}
+	// directions are multiples of pi and 4, convert to positive
+	// angle with mod and determine if angle is less clockwise
+	// if less clockwise, turn clockwise
+	isLessClockwise(angle, direction) {
+		let diff = direction - angle;
+		if (diff < 0) diff += 2 * Math.PI;
+		else if (diff > 2 * Math.PI) diff -= 2 * Math.PI;
+		console.log({ diff });
+		return diff > Math.PI;
+	}
+	isFacingDirection(direction) {
+		let result = Math.abs(this.rotation - direction);
+		let otherResult = Math.abs(this.rotation - direction - 2 * Math.PI);
+		if (result <= SKATEBOARD.ROTATION || otherResult <= SKATEBOARD.ROTATION) {
+			this.skateboard.rotation.y = direction;
+			return true;
+		}
+		return false;
+	}
+
 	createEnd(isTail) {
 		const noseLength = SKATEBOARD.LENGTH / 4;
 		const extrudePath = new THREE.CatmullRomCurve3([

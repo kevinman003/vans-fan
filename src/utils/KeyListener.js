@@ -1,4 +1,4 @@
-import { KEY_CODES } from './constants';
+import { KEY_CODES } from './constants/constants';
 
 export default class KeyListener {
 	constructor() {
