@@ -12,7 +12,7 @@ animate();
 function animate() {
 	requestAnimationFrame(animate);
 	game.skateboard.animation();
-	game.controls.update();
+	// game.controls.update();
 	game.renderer.render(game.scene, game.camera);
 }
 

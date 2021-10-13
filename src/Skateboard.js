@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { KEY_CODES } from './utils/constants/constants';
+import { KEY_CODES, CAMERA } from './utils/constants/constants';
 import { SKATEBOARD } from './utils/constants/skateboard';
 import { mod } from './utils/utils';
 
@@ -13,13 +13,13 @@ export default class Skateboard {
 		this.createEnd(false);
 		this.createEnd(true);
 		this.createWheels();
-
+		this.skateboard.position.set(0, 0, 0);
 		this.scene.add(this.skateboard);
 		this.x = 0;
 		this.z = 0;
 		this.rotation = 0;
 		this.rotationMult = 1;
-		console.log(SKATEBOARD);
+		this.isOnTop({ x: 0, y: 0, z: 0 });
 	}
 
 	createSkateboard() {
@@ -28,9 +28,8 @@ export default class Skateboard {
 			SKATEBOARD.HEIGHT,
 			SKATEBOARD.LENGTH
 		);
-		const material = new THREE.MeshLambertMaterial({ color: 0xfb8e00 });
+		const material = new THREE.MeshLambertMaterial({ color: 0x1f86ed });
 		let deck = new THREE.Mesh(this.geo, material);
-		deck.position.set(0, 0, 0);
 		this.skateboard.add(deck);
 	}
 
@@ -46,7 +45,7 @@ export default class Skateboard {
 		)
 			? SKATEBOARD.CLOCKWISE
 			: SKATEBOARD.C_CLOCKWISE;
-		console.log('rotation', rotationMult);
+
 		let rotationAng = this.rotation + SKATEBOARD.ROTATION;
 		// if (rotation)
 		this.rotation += SKATEBOARD.ROTATION * rotationMult;
@@ -79,16 +78,13 @@ export default class Skateboard {
 			}
 			this.moveBoardAndCamera();
 		}
-		console.log((this.skateboard.rotation.y / Math.PI) * 4);
 	}
 
 	moveBoardAndCamera() {
 		this.skateboard.translateZ(-SKATEBOARD.SPEED);
-		// this.camera.position.copy(this.skateboard.position);
-		// this.camera.translateX(this.skateboard.position.x);
-		this.camera.translateY(this.skateboard.position.y);
-		// this.camera.translateZ(this.skateboard.position.z);
-		// this.camera.lookAt(this.skateboard);
+		const newPosition = new THREE.Vector3(CAMERA.X, CAMERA.Y, CAMERA.Z);
+		newPosition.add(this.skateboard.position);
+		this.camera.position.copy(newPosition);
 	}
 	// directions are multiples of pi and 4, convert to positive
 	// angle with mod and determine if angle is less clockwise
@@ -97,7 +93,6 @@ export default class Skateboard {
 		let diff = direction - angle;
 		if (diff < 0) diff += 2 * Math.PI;
 		else if (diff > 2 * Math.PI) diff -= 2 * Math.PI;
-		console.log({ diff });
 		return diff > Math.PI;
 	}
 	isFacingDirection(direction) {
@@ -128,7 +123,7 @@ export default class Skateboard {
 		const extrudeSettings = {
 			extrudePath,
 		};
-		const noseMaterial = new THREE.MeshLambertMaterial({ color: 0xfb8e00 });
+		const noseMaterial = new THREE.MeshLambertMaterial({ color: 0x1f86ed });
 		// const geo = new THREE.ExtrudeGeometry(nose, extrudeSettings);
 		// const noseGeometry = new THREE.ShapeGeometry(nose);
 		const noseGeometry = new THREE.ExtrudeGeometry(nose, extrudeSettings);
@@ -136,15 +131,14 @@ export default class Skateboard {
 		const noseMesh = new THREE.Mesh(noseGeometry, noseMaterial);
 		const noseAngle = Math.PI / 8;
 
-		let yTranslate = (noseLength / 2) * Math.sin(noseAngle) - 0.005; // fine tuning
+		let yTranslate = (noseLength / 2) * Math.sin(noseAngle);
 		// to align bottom corner of nose to skateboard
 		let alignBottomCorner =
 			SKATEBOARD.HEIGHT * Math.cos(Math.PI / 2 - noseAngle);
 		let zTranslate =
 			SKATEBOARD.LENGTH / 2 +
 			(noseLength / 2) * Math.cos(noseAngle) -
-			alignBottomCorner +
-			0.02; // fine tuning
+			alignBottomCorner;
 		if (isTail) {
 			noseGeometry.rotateX(noseAngle);
 			zTranslate *= -1;
@@ -182,5 +176,16 @@ export default class Skateboard {
 		wheel.translateX(x);
 		wheel.translateZ(z);
 		this.skateboard.add(wheel);
+	}
+
+	isOnTop(position) {
+		console.log('fdsa', position, this.skateboard.x, this.skateboard.z);
+		let result =
+			position.x < this.skateboard.position.x + SKATEBOARD.WIDTH / 2 &&
+			position.x > this.skateboard.position.x - SKATEBOARD.WIDTH / 2 &&
+			position.z < this.skateboard.position.z + SKATEBOARD.LENGTH / 2 &&
+			position.z > this.skateboard.position.z - SKATEBOARD.LENGTH / 2;
+		console.log({ result });
+		return result;
 	}
 }
