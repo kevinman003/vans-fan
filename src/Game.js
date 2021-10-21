@@ -79,7 +79,7 @@ export default class Game {
 		this.scene.add(ambientLight);
 
 		const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
-		directionalLight.position.set(10, 20, 0);
+		directionalLight.position.set(-CAMERA.X, CAMERA.Y, CAMERA.Z);
 		this.scene.add(directionalLight);
 	}
 }

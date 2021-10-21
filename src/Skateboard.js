@@ -13,7 +13,7 @@ export default class Skateboard {
 		this.createEnd(false);
 		this.createEnd(true);
 		this.createWheels();
-		this.skateboard.position.set(0, 0, 0);
+		this.skateboard.position.set(8, 0, -5);
 		this.scene.add(this.skateboard);
 		this.x = 0;
 		this.z = 0;
@@ -179,7 +179,6 @@ export default class Skateboard {
 	}
 
 	isOnTop(position) {
-		console.log('fdsa', position, this.skateboard.x, this.skateboard.z);
 		let result =
 			position.x < this.skateboard.position.x + SKATEBOARD.WIDTH / 2 &&
 			position.x > this.skateboard.position.x - SKATEBOARD.WIDTH / 2 &&
